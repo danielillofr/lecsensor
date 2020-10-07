@@ -43,7 +43,7 @@ Localizar_indice_pm25 = (datos, momento) => {
 
 }
 
-Obtener_array_completo = (datos, fechaInicial, fechaFinal, tiempo) => {
+Obtener_array_completo = (datos, fechaInicial, fechaFinal, tiempo, fechaLocal) => {
     valores = [];
     fechas = [];
     if (datos.length > 0)
@@ -74,8 +74,18 @@ Obtener_array_completo = (datos, fechaInicial, fechaFinal, tiempo) => {
         ultima = Localizar_indice_pm25(datos,fechaFin);
         console.log('Primera:',primera)
         console.log('ultima:',ultima)
+        let fechaServer = new Date();
+        console.log(fechaLocal)
+        let fechaLocalDate = new Date(Date.parse(fechaLocal));
+        console.log(fechaLocalDate);
+        console.log(fechaServer)
+        let diferencia = fechaLocalDate.getTime() - fechaServer.getTime();
+        console.log(diferencia);
         for(i=primera; i < ultima; i++) {
-            const fechaMuestra = new Date(Date.parse(datos[i].date));
+            let fechaMuestra = new Date(Date.parse(datos[i].date));
+            //console.log(fechaMuestra)
+            fechaMuestra.setTime(fechaMuestra.getTime() + diferencia); 
+            // console.log(fechaMuestra)
             fechas.push(`${fechaMuestra.getHours()}:${fechaMuestra.getMinutes()}:${fechaMuestra.getSeconds()}`);
             valores.push(datos[i].value);
         }
@@ -117,7 +127,8 @@ Crear_array_25 = (datos, fechaInicial, fechaFinal, tiempo) => {
             while (fecha < fechaFin) {
                 valor = Localizar_valor_pm25(datos, fecha);
                 valores.push(valor);
-                fechas.push(`${fecha.getHours()}:${fecha.getMinutes()}`);
+                // fechas.push(`${fecha.getHours()}:${fecha.getMinutes()}`);
+                fechas.push(fecha.toISOString());
                 fecha.setSeconds(fecha.getSeconds() + tiempo);
                 console.log(fecha)
             }

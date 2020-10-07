@@ -33,10 +33,18 @@ app.get('/csv/:mac', (req,res)=>{
         })
     }
     const finish = req.query.finish;
+    if(!req.query.fechaLocal)
+    {
+        return res.json({
+            ok: false,
+            error: 'fechaLocal es obligatorio'
+        })
+    }
+    const fechaLocal = req.query.fechaLocal;
     Datos.Obtener_datos(mac,start,finish,'aqpm2_5')
     .then((resultado)=>{
 
-        array = Datos.Obtener_array_completo(resultado,start,finish,1);
+        array = Datos.Obtener_array_completo(resultado,start,finish,1,fechaLocal);
         //console.log(array)
         console.log('Enviando el fichero')
     
@@ -44,7 +52,7 @@ app.get('/csv/:mac', (req,res)=>{
         res.setHeader('Content-Disposition', 'attachment; filename=datos.csv');
         fila=[];
         for (i=0; i < array.fechas.length;i++) {
-            console.log(array.fechas[i])
+            // console.log(array.fechas[i])
             fila.push(`${array.fechas[i]};${array.valores[i]}`);
         }
         res.write(fila.join('\n'));
