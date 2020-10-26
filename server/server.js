@@ -4,6 +4,10 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const path = require('path')
 const app = express();
+const datosLogin = require('./../configs/usuarios.json')
+
+let tokenActual = datosLogin.token;
+
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -41,11 +45,12 @@ app.get('/csv/:mac', (req,res)=>{
         })
     }
     const fechaLocal = req.query.fechaLocal;
-    Datos.Obtener_datos(mac,start,finish,'aqpm2_5')
+    console.log('fechaLocal:', fechaLocal);
+    Datos.Obtener_datos(mac,start,finish,'aqpm2_5',tokenActual)
     .then((resultado)=>{
-
+        console.log('Resultado:', resultado);
         array = Datos.Obtener_array_completo(resultado,start,finish,1,fechaLocal);
-        //console.log(array)
+        console.log(array)
         console.log('Enviando el fichero')
     
         res.setHeader('Content-Type', 'text/plain');
@@ -70,6 +75,28 @@ app.get('/csv/:mac', (req,res)=>{
 
 })
 
+Obtener_datos_login = async(mac,start,finish) => {
+    try {
+        datos = await Datos.Obtener_datos(mac,start,finish,'aqpm2_5',tokenActual);
+        // console.log('Datos:', datos);
+        if ((datos.exp) || (datos.msg === 'Not authorized')) {
+            logued = await Datos.Login();
+            tokenActual = logued.token;
+            console.log('Token actualizado')
+            datos = await Datos.Obtener_datos(mac,start,finish,'aqpm2_5',tokenActual);
+            if ((datos.exp) || (datos.msg === 'Not authorized')) {
+                console.log('Token no valido');
+                throw new Error('Token no valido')
+            }
+        }
+        array = Datos.Crear_array_25(datos,start,finish,null);
+        // console.log(array);
+        return array;
+    }catch(error){
+        throw new Error(error);
+    }
+}
+
 app.get('/datos/:mac', (req,res)=>{
     const mac=req.params.mac;
     if(!req.query.start)
@@ -88,21 +115,14 @@ app.get('/datos/:mac', (req,res)=>{
         })
     }
     const finish = req.query.finish;
-    Datos.Obtener_datos(mac,start,finish,'aqpm2_5')
-    .then((resultado)=>{
 
-        array = Datos.Crear_array_25(resultado,start,finish,null);
-        console.log(array)
+
+    Obtener_datos_login (mac,start,finish)
+    .then((array)=>{
+        // console.log(array)
         res.json({
             array
         });
-        // console.log(array25);
-
-        // res.json({
-        //     ok: true,
-        //     array25: array25
-        // })
-        // console.log(resultado)
     })
     .catch((error)=>{
         console.log(error)
@@ -110,8 +130,21 @@ app.get('/datos/:mac', (req,res)=>{
             ok: false,
             error
         })
-    });
+    })
+
+
 })
+
+Datos.Login()
+    .then((ok) => {
+        console.log('Bien');
+        tokenActual = ok.token;
+        console.log('Token actualizado a :', tokenActual)
+
+    })
+    .catch((mal)=>{
+        console.log('Mal')
+    })
 
 app.listen(process.env.PORT, () => {
     console.log('Escuchando puerto: ', 3000);

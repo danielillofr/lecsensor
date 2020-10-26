@@ -25,14 +25,14 @@ Localizar_indice_pm25 = (datos, momento) => {
     if (momento > Date.parse(datos[datos.length - 1].date)) { //Si no hay muestras posteriores al momento, nos quedamos con la última
         return datos.length - 1;
     }
-    console.log('Momento:',momento)
-    console.log('fffff:',datos[muestra].date)
-    console.log('Fehca:', Date.parse(datos[muestra].date))
+    // console.log('Momento:',momento)
+    // console.log('fffff:',datos[muestra].date)
+    // console.log('Fehca:', Date.parse(datos[muestra].date))
     while(momento > Date.parse(datos[muestra].date))
-    {
+    { 
         muestra++;
-        console.log('Muestra:',muestra)
-        console.log('Momento:',momento)
+        // console.log('Muestra:',muestra)
+        // console.log('Momento:',momento)
     }
     if (muestra > 0) {
         return muestra - 1;//LUEGO HAY QUE CAMBIAR ESTO A LA MUESTRA ANTERIOR
@@ -75,17 +75,15 @@ Obtener_array_completo = (datos, fechaInicial, fechaFinal, tiempo, fechaLocal) =
         console.log('Primera:',primera)
         console.log('ultima:',ultima)
         let fechaServer = new Date();
-        console.log(fechaLocal)
+        console.log('Fecha Local2:', fechaLocal)
         let fechaLocalDate = new Date(Date.parse(fechaLocal));
-        console.log(fechaLocalDate);
-        console.log(fechaServer)
+        console.log('fechaLocalDate:', fechaLocalDate);
+        console.log('fechaServer:', fechaServer)
         let diferencia = fechaLocalDate.getTime() - fechaServer.getTime();
         console.log(diferencia);
         for(i=primera; i < ultima; i++) {
             let fechaMuestra = new Date(Date.parse(datos[i].date));
-            //console.log(fechaMuestra)
             fechaMuestra.setTime(fechaMuestra.getTime() + diferencia); 
-            // console.log(fechaMuestra)
             fechas.push(`${fechaMuestra.getHours()}:${fechaMuestra.getMinutes()}:${fechaMuestra.getSeconds()}`);
             valores.push(datos[i].value);
         }
@@ -130,7 +128,7 @@ Crear_array_25 = (datos, fechaInicial, fechaFinal, tiempo) => {
                 // fechas.push(`${fecha.getHours()}:${fecha.getMinutes()}`);
                 fechas.push(fecha.toISOString());
                 fecha.setSeconds(fecha.getSeconds() + tiempo);
-                console.log(fecha)
+                // console.log(fecha)
             }
             console.log('Fin del while:')
         }
@@ -140,10 +138,10 @@ Crear_array_25 = (datos, fechaInicial, fechaFinal, tiempo) => {
         }
 }
 
-Obtener_datos = (mac, fechaInicio, fechaFin, parametro) => {
+Obtener_datos = (mac, fechaInicio, fechaFin, parametro,tokenActual) => {
     return new Promise((resolve,reject)=>{
         https.get(`${CONFIG.URL}/${mac}/aidoo?start=${fechaInicio}&param=${parametro}&finish=${fechaFin}&installationId=${CONFIG.INSTALLATION}`
-                    ,{headers: {Authorization: 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1MlJkWFcyS3FJS3lTc0N6N3Z6N1BoaXIxSWdHVHpvOSIsInRva2VuSWQiOiIyMDVhZjI3ZC02MzM3LTQ3ODAtYjc4ZS0zZjYyNWJlNDkyYWIiLCJqdGkiOiIwYzNiZDZhOC1jYjZjLTRiMGItOGEyZS1kODMxM2Y1YWNhZGYiLCJpYXQiOjE2MDE5ODU5MTUsImV4cCI6MTYwMjE1ODcxNX0.I7Rnc6v1N5Sx-uaDo5lmznkX03k7Qyccx5OQ2ubEs00'}}
+                    ,{headers: {Authorization: `Bearer ${tokenActual}`}}
                     , (res)=>{
                         let data='';
                         res.on("data", (chunk)=>{
@@ -161,4 +159,37 @@ Obtener_datos = (mac, fechaInicio, fechaFin, parametro) => {
     })
 }
 
-module.exports = {Obtener_datos,Crear_array_25,Obtener_array_completo}
+Login = () => {
+    var options = {
+        hostname: 'devaidoo.airzonecloud.com',
+        port: 8443,
+        path: '/api/v1/auth/login/aidoo',
+        method: 'POST',
+        headers: {
+             'Content-Type': 'application/json'
+           }
+      };  
+      const postData = JSON.stringify({"email": "devapps@altracorporacion.es", "password": "password"});  
+    return new Promise ((resolve, reject) => {
+        var req = https.request(options, (res) => {
+            console.log('statusCode:', res.statusCode);
+            console.log('headers:', res.headers);
+          
+            res.on('data', (d) => {
+            //   process.stdout.write(d);
+                console.log(JSON.parse(d));
+                resolve(JSON.parse(d));
+            });
+          });
+          
+          req.on('error', (e) => {
+            console.error(e);
+            reject(true);
+          });
+          
+          req.write(postData);
+          req.end();        
+    })
+}
+
+module.exports = {Obtener_datos,Crear_array_25,Obtener_array_completo,Login}
