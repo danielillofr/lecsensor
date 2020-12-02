@@ -140,7 +140,7 @@ Crear_array_25 = (datos, fechaInicial, fechaFinal, tiempo) => {
 
 Obtener_datos = (mac, fechaInicio, fechaFin, parametro,tokenActual) => {
     return new Promise((resolve,reject)=>{
-        https.get(`${CONFIG.URL}/${mac}/dknEU?start=${fechaInicio}&param=${parametro}&finish=${fechaFin}&installationId=${CONFIG.INSTALLATION}`
+        https.get(`${CONFIG.URL}/${mac}/dknEU?start=${fechaInicio}&params=${parametro}&finish=${fechaFin}&installationId=${CONFIG.INSTALLATION}`
                     ,{headers: {Authorization: `Bearer ${tokenActual}`}}
                     , (res)=>{
                         let data='';
