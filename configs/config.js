@@ -1,7 +1,7 @@
-const URL = 'https://devaidoo.airzonecloud.com:8443/api/v1/history/events';
-const INSTALLATION = '5f7c5da2d14359699ab62c42';
+const URL = 'https://predkneu.airzonecloud.com:8443/api/v1/history/events';
+const INSTALLATION = '5d303c3e035590649fb161aa';
 
-const USUARIO = 'devapps@altracorporacion.es';
+const USUARIO = 'dfernandez@altracorporacion.es';
 const PASSWORD = 'password';
 
 process.env.PORT = process.env.PORT || 3000;

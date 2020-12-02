@@ -140,7 +140,7 @@ Crear_array_25 = (datos, fechaInicial, fechaFinal, tiempo) => {
 
 Obtener_datos = (mac, fechaInicio, fechaFin, parametro,tokenActual) => {
     return new Promise((resolve,reject)=>{
-        https.get(`${CONFIG.URL}/${mac}/aidoo?start=${fechaInicio}&param=${parametro}&finish=${fechaFin}&installationId=${CONFIG.INSTALLATION}`
+        https.get(`${CONFIG.URL}/${mac}/dknEU?start=${fechaInicio}&param=${parametro}&finish=${fechaFin}&installationId=${CONFIG.INSTALLATION}`
                     ,{headers: {Authorization: `Bearer ${tokenActual}`}}
                     , (res)=>{
                         let data='';
@@ -161,15 +161,18 @@ Obtener_datos = (mac, fechaInicio, fechaFin, parametro,tokenActual) => {
 
 Login = () => {
     var options = {
-        hostname: 'devaidoo.airzonecloud.com',
+        hostname: 'predkneu.airzonecloud.com',
         port: 8443,
-        path: '/api/v1/auth/login/aidoo',
+        path: '/api/v1/auth/login/dknEU',
         method: 'POST',
         headers: {
              'Content-Type': 'application/json'
            }
       };  
-      const postData = JSON.stringify({"email": "devapps@altracorporacion.es", "password": "password"});  
+      const postData = JSON.stringify({"email": "dfdezruiz@gmail.com", "password": "password"});  
+      console.log('Login:')
+      console.log('Options:', options);
+      console.log('Postdata:', postData)
     return new Promise ((resolve, reject) => {
         var req = https.request(options, (res) => {
             console.log('statusCode:', res.statusCode);
