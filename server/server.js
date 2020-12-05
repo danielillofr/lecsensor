@@ -45,8 +45,16 @@ app.get('/csv/:mac', (req,res)=>{
         })
     }
     const fechaLocal = req.query.fechaLocal;
+    if(!req.query.param)
+    {
+        return res.json({
+            ok: false,
+            error: 'param es obligatorio'
+        })
+    }
+    const param = req.query.param;    
     console.log('fechaLocal:', fechaLocal);
-    Datos.Obtener_datos(mac,start,finish,'aqpm2_5',tokenActual)
+    Datos.Obtener_datos(mac,start,finish,param,tokenActual)
     .then((resultado)=>{
         console.log('Resultado:', resultado);
         array = Datos.Obtener_array_completo(resultado,start,finish,1,fechaLocal);
@@ -67,23 +75,19 @@ app.get('/csv/:mac', (req,res)=>{
     .catch((error)=>{
         console.log('Error en la descarga')
         console.log(error)
-        // res.json({
-        //     ok: false,
-        //     error
-        // })
     });
 
 })
 
-Obtener_datos_login = async(mac,start,finish) => {
+Obtener_datos_login = async(mac,start,param,finish) => {
     try {
-        datos = await Datos.Obtener_datos(mac,start,finish,'aqpm2_5',tokenActual);
+        datos = await Datos.Obtener_datos(mac,start,finish,param,tokenActual);
         // console.log('Datos:', datos);
         if ((datos.exp) || (datos.msg === 'Not authorized')) {
             logued = await Datos.Login();
             tokenActual = logued.token;
             console.log('Token actualizado')
-            datos = await Datos.Obtener_datos(mac,start,finish,'aqpm2_5',tokenActual);
+            datos = await Datos.Obtener_datos(mac,start,finish,param,tokenActual);
             if ((datos.exp) || (datos.msg === 'Not authorized')) {
                 console.log('Token no valido');
                 throw new Error('Token no valido')
@@ -96,6 +100,54 @@ Obtener_datos_login = async(mac,start,finish) => {
         throw new Error(error);
     }
 }
+
+Obtener_todo = async(mac,start,finish) => {
+    try{
+        particulas = await Obtener_datos_login (mac,start,'aqpm2_5',finish);
+        temperatura = await Obtener_datos_login (mac,start,'work_temp',finish);
+        return {
+            particulas,
+            temperatura
+        }
+    }catch(error) {
+        console.log(error)
+        throw new Error(error);
+    }
+}
+
+app.get('/datos/todo/:mac', (req,res)=>{
+    const mac=req.params.mac;
+    if(!req.query.start)
+    {
+        return res.json({
+            ok: false,
+            error: 'start es obligatorio'
+        })
+    }
+    const start = req.query.start;
+    if(!req.query.finish)
+    {
+        return res.json({
+            ok: false,
+            error: 'finish es obligatorio'
+        })
+    }
+    const finish = req.query.finish;
+    Obtener_todo (mac,start,finish)
+    .then((objeto)=>{
+        // console.log(array)
+        res.json({
+            objeto
+        });
+    })
+    .catch((error)=>{
+        console.log(error)
+        res.json({
+            ok: false,
+            error
+        })
+    })  
+})
 
 app.get('/datos/:mac', (req,res)=>{
     const mac=req.params.mac;
@@ -115,9 +167,18 @@ app.get('/datos/:mac', (req,res)=>{
         })
     }
     const finish = req.query.finish;
+    if(!req.query.param)
+    {
+        return res.json({
+            ok: false,
+            error: 'param es obligatorio'
+        })
+    }
+    const param = req.query.param;
 
+    console.log('param:', param)
 
-    Obtener_datos_login (mac,start,finish)
+    Obtener_datos_login (mac,start,param,finish)
     .then((array)=>{
         // console.log(array)
         res.json({

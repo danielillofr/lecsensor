@@ -1,3 +1,4 @@
+const { Console } = require('console');
 const https = require('https');
 const CONFIG = require('./../configs/config')
 
@@ -112,15 +113,17 @@ Crear_array_25 = (datos, fechaInicial, fechaFinal, tiempo) => {
             }else{
                 fechaFin = new Date(Date.parse(datos[datos.length - 1].fecha));
             }
+            console.log('Datos lenght:', datos.length)
             if (!tiempo){
-                if (datos.length < 500)
+                /*if (datos.length < 500)
                 {
                     tiempo = 1;
-                }else{
+                }else{*/
                     auxT = fechaFin.getTime() - fecha.getTime();
                     tiempo = auxT / 500000;
-                }
+                // }
             }
+
             console.log(`${fecha}-${fechaFin} con tiempo ${tiempo}`)
             while (fecha < fechaFin) {
                 valor = Localizar_valor_pm25(datos, fecha);
