@@ -54,11 +54,12 @@ app.get('/csv/:mac', (req,res)=>{
     }
     const param = req.query.param;    
     console.log('fechaLocal:', fechaLocal);
-    Datos.Obtener_datos(mac,start,finish,param,tokenActual)
+    // Datos.Obtener_datos(mac,start,finish,param,tokenActual)
+    Datos.Obtener_instalacion_y_datos(mac,start,finish,param,tokenActual)
     .then((resultado)=>{
-        console.log('Resultado:', resultado);
+        // console.log('Resultado:', resultado);
         array = Datos.Obtener_array_completo(resultado,start,finish,1,fechaLocal);
-        console.log(array)
+        // console.log(array)
         console.log('Enviando el fichero')
     
         res.setHeader('Content-Type', 'text/plain');
@@ -81,13 +82,15 @@ app.get('/csv/:mac', (req,res)=>{
 
 Obtener_datos_login = async(mac,start,param,finish) => {
     try {
-        datos = await Datos.Obtener_datos(mac,start,finish,param,tokenActual);
-        // console.log('Datos:', datos);
+        // datos = await Datos.Obtener_datos(mac,start,finish,param,tokenActual);
+        // console.log('Token Actual:', tokenActual);
+        datos = await Datos.Obtener_instalacion_y_datos(mac,start,finish,param,tokenActual);
         if ((datos.exp) || (datos.msg === 'Not authorized')) {
             logued = await Datos.Login();
             tokenActual = logued.token;
             console.log('Token actualizado')
-            datos = await Datos.Obtener_datos(mac,start,finish,param,tokenActual);
+            // datos = await Datos.Obtener_datos(mac,start,finish,param,tokenActual);
+            datos = await Datos.Obtener_instalacion_y_datos(mac,start,finish,param,tokenActual);
             if ((datos.exp) || (datos.msg === 'Not authorized')) {
                 console.log('Token no valido');
                 throw new Error('Token no valido')
@@ -176,7 +179,7 @@ app.get('/datos/:mac', (req,res)=>{
     }
     const param = req.query.param;
 
-    console.log('param:', param)
+    // console.log('param:', param)
 
     Obtener_datos_login (mac,start,param,finish)
     .then((array)=>{
@@ -200,7 +203,7 @@ Datos.Login()
     .then((ok) => {
         console.log('Bien');
         tokenActual = ok.token;
-        console.log('Token actualizado a :', tokenActual)
+        // console.log('Token actualizado a :', tokenActual)
 
     })
     .catch((mal)=>{
