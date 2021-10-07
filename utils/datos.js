@@ -216,8 +216,14 @@ function Obtener_installation_id (mac, tokenActual) {
                 data += chunk;
             })
             res.on("end", ()=>{
-                console.log('Descarga instalación Ok');
+                console.log('Descarga instalación Ok:', data);
+                if (data.indexOf('Bad token') > -1) {
+                    resolve(data);
+                    return;
+                }
                 let instalaciones = JSON.parse(data);
+
+                console.log(instalaciones)
                 for (let i = 0; i < instalaciones.length; i++)
                 {
                     for (let j = 0; j < instalaciones[i].devices.length; j++)

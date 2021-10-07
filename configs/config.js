@@ -5,7 +5,7 @@ const URL_INSTALLATIONS = 'https://dkneu.airzonecloud.com/api/v1/installations/d
 // const INSTALLATION = '5d303c3e035590649fb161aa';
 
 const USUARIO = 'dfernandez@altracorporacion.es';
-const PASSWORD = '123498765';
+const PASSWORD = 'password';
 
 process.env.PORT = process.env.PORT || 3000;
 

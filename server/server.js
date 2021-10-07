@@ -84,17 +84,22 @@ Obtener_datos_login = async(mac,start,param,finish) => {
     try {
         // datos = await Datos.Obtener_datos(mac,start,finish,param,tokenActual);
         // console.log('Token Actual:', tokenActual);
+        console.log('Intengo datos login')
         datos = await Datos.Obtener_instalacion_y_datos(mac,start,finish,param,tokenActual);
-        if ((datos.exp) || (datos.msg === 'Not authorized')) {
+        console.log('Datos:',datos);
+        if ((datos.exp) || (datos.msg === 'Not authorized') || (datos.message === 'Bad token; invalid JSON')) {
+            console.log('A logearse de nuevo');
             logued = await Datos.Login();
             tokenActual = logued.token;
-            console.log('Token actualizado')
+            console.log('Token actualizado:', tokenActual)
             // datos = await Datos.Obtener_datos(mac,start,finish,param,tokenActual);
             datos = await Datos.Obtener_instalacion_y_datos(mac,start,finish,param,tokenActual);
             if ((datos.exp) || (datos.msg === 'Not authorized')) {
                 console.log('Token no valido');
                 throw new Error('Token no valido')
             }
+        }else{
+            console.log('Datos correctos')
         }
         array = Datos.Crear_array_25(datos,start,finish,null);
         // console.log(array);
